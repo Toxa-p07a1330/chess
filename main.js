@@ -307,6 +307,10 @@ class ChessGame {
             // Perform the move
             this.board[endRow][endCol] = this.board[startRow][startCol];
             this.board[startRow][startCol] = null;
+            if (this.board[endRow][endCol] === "wk")
+                this.whiteKingMoved = true
+            if (this.board[endRow][endCol] === "bk")
+                this.blackKingMoved = true
 
             // Switch the current player
             this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
