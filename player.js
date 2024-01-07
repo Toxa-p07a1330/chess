@@ -77,6 +77,99 @@ class AIPlayer {
         // console.log(`${startFile}${startRank}${endFile}${endRank}`)
         return `${startFile}${startRank}${endFile}${endRank}`;
     }
+
+    calculateScore() {
+        const pieceValues = {
+            'p': 1,
+            'n': 3.5,
+            'b': 3,
+            'r': 9,
+            'q': 9,
+            'k': 100,
+        };
+
+        let whiteScore = 0;
+        let blackScore = 0;
+
+        // Loop through the board to calculate scores
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const piece = this.chessGame.board[i][j];
+                if (piece) {
+                    const pieceType = piece.charAt(1);
+                    const pieceColor = piece.charAt(0);
+
+                    // Calculate base score
+                    let pieceScore = pieceValues[pieceType];
+
+                    // Check if the piece is protected
+                    const isProtected = this.isSquareProtected(i, j, pieceColor);
+                    if (isProtected) {
+                        pieceScore *= 1.2; // Increase value by 20%
+                    }
+
+                    // Check if the piece is attacked
+                    const isAttacked = this.isSquareAttacked(i, j, pieceColor);
+                    if (isAttacked) {
+                        pieceScore *= 0.65; // Decrease value by 35%
+                    }
+
+                    // Add piece score to the respective color
+                    if (pieceColor === 'w') {
+                        whiteScore += pieceScore;
+                    } else {
+                        blackScore += pieceScore;
+                    }
+                }
+            }
+        }
+
+        // Add scores for checks
+        const whiteChecks = this.getChecks('white');
+        const blackChecks = this.getChecks('black');
+
+        whiteScore += whiteChecks * 0.25;
+        blackScore -= blackChecks * 0.25;
+
+        return { whiteScore, blackScore };
+    }
+
+    isSquareProtected(row, col, color) {
+        // Check if the square is protected by any piece of the same color
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const piece = this.chessGame.board[i][j];
+                if (piece && piece.charAt(0) === color && this.chessGame.isValidMove(i, j, row, col, false)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    isSquareAttacked(row, col, color) {
+        // Check if the square is attacked by any piece of the opposite color
+        const opponentColor = color === 'w' ? 'b' : 'w';
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const piece = this.chessGame.board[i][j];
+                if (piece && piece.charAt(0) === opponentColor && this.chessGame.isValidMove(i, j, row, col, true)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    getChecks(color) {
+        // Check if the king of the specified color is in check
+        this.outputEnabled = false; // Disable output for isInCheck
+        const isInCheck = this.chessGame.isInCheck();
+        this.outputEnabled = true; // Enable output back
+
+        return color === 'white' ? (isInCheck ? 1 : 0) : (isInCheck ? -1 : 0);
+    }
+
 }
 
 // Example usage:
@@ -87,4 +180,6 @@ const stepsAmount = 50;
 for (let i = 0; i < stepsAmount; i++) {
     const step = aiPlayer.makeMove(true);
     aiPlayer.chessGame.makeMove(step)
+    const score = aiPlayer.calculateScore()
+    console.log(score)
 }
