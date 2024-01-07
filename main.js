@@ -3,7 +3,9 @@ class ChessGame {
         this.board = this.initializeBoard();
         this.currentPlayer = 'white';
         this.outputEnabled = true; // Flag to control output for invalid moves
-        this.status = ""
+        this.status = "";
+        this.whiteKingMoved = false;
+        this.blackKingMoved = false;
     }
 
     initializeBoard() {
@@ -62,7 +64,6 @@ class ChessGame {
         const endPiece = endRow !== undefined && endCol !== undefined && this.board[endRow][endCol] || null;
 
 
-
         // Check if the starting cell is empty
         if (!startPiece) {
             return false; // Empty cell
@@ -81,8 +82,6 @@ class ChessGame {
         if (!checkOpponent && endPiece && (endPiece.charAt(0) === this.currentPlayer.charAt(0))) {
             return false; // Self taking
         }
-
-
 
 
         // Check if the move is valid according to the piece's rules
@@ -118,8 +117,8 @@ class ChessGame {
                 }
                 break;
             default:
-            //    if (this.outputEnabled)
-                    console.log("Invalid piece type");
+                //    if (this.outputEnabled)
+                console.log("Invalid piece type");
                 return false;
         }
 
@@ -136,6 +135,37 @@ class ChessGame {
         this.board[endRow][endCol] = originalPiece;
 
         return !isInCheck;
+    }
+
+
+    isSquareUnderAttack(row, col) {
+        // Check if the square is under attack by the opponent
+        const opponentColor = this.currentPlayer === 'white' ? 'black' : 'white';
+
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const piece = this.board[i][j];
+                if (piece && piece.charAt(0) === opponentColor.charAt(0)) {
+                    if (this.isValidMove(i, j, row, col, true)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    updateKingMovedStatus(piece) {
+        // Extract color from the piece notation
+        const color = piece.charAt(0);
+
+        // Update king movement status based on color
+        if (color === 'w') {
+            this.whiteKingMoved = true;
+        } else if (color === 'b') {
+            this.blackKingMoved = true;
+        }
     }
 
     // Methods for checking specific piece moves
@@ -240,7 +270,6 @@ class ChessGame {
     }
 
     isValidKingMove(startRow, startCol, endRow, endCol) {
-        // Simplified king move logic (no obstacles to check)
         return Math.abs(startRow - endRow) <= 1 && Math.abs(startCol - endCol) <= 1;
     }
 
@@ -255,6 +284,17 @@ class ChessGame {
     }
 
     makeMove(algebraicNotation) {
+
+        if (algebraicNotation === 'O-O') {
+            // Short castling for the current player
+            this.performShortCastling();
+            return;
+        } else if (algebraicNotation === 'O-O-O') {
+            // Long castling for the current player
+            this.performLongCastling();
+            return;
+        }
+
         const {startRow, startCol, endRow, endCol} = this.algebraicToIndices(algebraicNotation);
         this.outputEnabled = true; // Enable output for makeMove
         this.status = ""
@@ -269,11 +309,128 @@ class ChessGame {
             // Log the updated board
             this.printBoard();
         } else {
-           // if (this.outputEnabled)
-                console.log('Invalid move');
+            // if (this.outputEnabled)
+            console.log('Invalid move');
         }
     }
 
+    performShortCastling() {
+        const row = this.currentPlayer === 'white' ? 0 : 7;
+        const castlingEndCol = this.currentPlayer === 'white' ? 6 : 5;
+
+        const kingMoved = this.currentPlayer === 'white' ? this.whiteKingMoved : this.blackKingMoved;
+
+        if (
+            kingMoved ||
+            !this.isRookInPosition(row, 7) ||
+            !this.isValidCastlingMove(row, 4, row, castlingEndCol)
+        ) {
+            console.log("Short castling is not allowed");
+            return;
+        }
+
+        // Move the king
+        this.board[row][6] = this.board[row][4];
+        this.board[row][4] = null;
+        // Move the rook
+        this.board[row][5] = this.board[row][7];
+        this.board[row][7] = null
+
+
+        if (this.currentPlayer === 'white') {
+            this.whiteKingMoved = true;
+        } else {
+            this.blackKingMoved = true;
+        }
+
+        this.switchPlayer();
+        this.printBoard();
+    }
+
+    performLongCastling() {
+        const rookCol = this.currentPlayer === 'white' ? 0 : 7;
+        const castlingEndCol = this.currentPlayer === 'white' ? 2 : 3;
+
+        const kingMoved = this.currentPlayer === 'white' ? this.whiteKingMoved : this.blackKingMoved;
+
+        if (
+            kingMoved ||
+            !this.isRookInPosition(7, rookCol) ||
+            !this.isValidCastlingMove(7, 4, 7, castlingEndCol)
+        ) {
+            console.log("Long castling is not allowed");
+            return;
+        }
+
+        // Move the king
+        this.board[7][castlingEndCol] = this.board[7][4];
+
+        // Move the rook
+        this.board[7][castlingEndCol + 1] = this.board[7][rookCol];
+
+        if (this.currentPlayer === 'white') {
+            this.whiteKingMoved = true;
+        } else {
+            this.blackKingMoved = true;
+        }
+
+        this.switchPlayer();
+        this.printBoard();
+    }
+
+    switchPlayer() {
+        this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+    }
+
+    isRookInPosition(row, col) {
+        const rookColor = this.currentPlayer === 'white' ? 'w' : 'b';
+        const rookType = 'r';
+        return this.board[row][col] === rookColor + rookType;
+    }
+
+    isValidCastlingMove(startRow, startCol, endRow, endCol) {
+
+        const startPiece = this.board[startRow][startCol];
+        const endPiece = this.board[endRow][endCol];
+
+        // Check if the starting cell is empty or has the king
+        if (!startPiece || startPiece.charAt(1) !== 'k') {
+            console.log("Invalid castling move");
+            return false;
+        }
+
+
+        // Check if the king and rook have not moved
+
+        const rookCol = startCol < endCol ? 7 : 0;
+        const kingMoved = this.currentPlayer === 'white' ? this.whiteKingMoved : this.blackKingMoved;
+
+        if (kingMoved || !this.isRookInPosition(startRow, rookCol)) {
+            console.log("Invalid castling move - king or rook has moved");
+            return false;
+        }
+
+        // Check if there are no pieces between the king and rook
+        const step = startCol < endCol ? 1 : -1;
+        for (let i = startCol + step; i !== endCol; i += step) {
+            if (this.board[startRow][i] !== null) {
+                console.log("Invalid castling move - pieces between king and rook");
+                return false;
+            }
+        }
+
+        // Check if the king is not in check and does not pass through squares under attack
+        if (
+            this.isInCheck() ||
+            this.isSquareUnderAttack(startRow, startCol) ||
+            this.isSquareUnderAttack(endRow, endCol)
+        ) {
+            console.log("Invalid castling move - king is in check or passes through attacked squares");
+            return false;
+        }
+
+        return true;
+    }
 
     isCheckmate() {
         // Find the king's position
@@ -383,8 +540,16 @@ class ChessGame {
 
 // Example usage:
 const chessGame = new ChessGame();
-chessGame.makeMove("g2g4"); // Example move
+chessGame.makeMove("e2e4"); // Example move
 chessGame.makeMove("e7e5"); // Example move
-chessGame.makeMove("f2f3"); // Example move
-chessGame.makeMove("d8h4"); // Example move
+chessGame.makeMove("f1e2"); // Example move
+chessGame.makeMove("h7h6"); // Example move
+chessGame.makeMove("g1f3"); // Example move
+chessGame.makeMove("g7g5"); // Example move
+chessGame.makeMove("O-O"); // Example move
+chessGame.makeMove("f8e7"); // Example move
+chessGame.makeMove("a2a3"); // Example move
+chessGame.makeMove("g8f6"); // Example move
+chessGame.makeMove("a3a4"); // Example move
+chessGame.makeMove("O-O")
 chessGame.isCheckmate();
