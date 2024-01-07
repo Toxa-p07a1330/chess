@@ -58,6 +58,8 @@ class ChessGame {
 
         const startPiece = this.board[startRow][startCol];
 
+
+
         // Check if the starting cell is empty
         if (!startPiece) {
             return false; // Empty cell
@@ -67,6 +69,8 @@ class ChessGame {
         if (checkOpponent && startPiece.charAt(0) === this.currentPlayer.charAt(0)) {
             return false; // Wrong-colored piece
         }
+
+
 
         // Check specific rules for the type of piece
         switch (startPiece.charAt(1)) {
@@ -240,7 +244,7 @@ class ChessGame {
                     if (piece && piece.charAt(0) === this.currentPlayer.charAt(0)) {
                         for (let row = 0; row < 8; row++) {
                             for (let col = 0; col < 8; col++) {
-                                if (this.isValidMove(i, j, row, col, true) && !this.isInCheckAfterMove(i, j, row, col)) {
+                                if (this.isValidMove(i, j, row, col, false) && !this.isInCheckAfterMove(i, j, row, col)) {
                                     console.log(`${this.currentPlayer} is not in checkmate.`);
                                     return false;
                                 }
@@ -322,9 +326,10 @@ class ChessGame {
 
 // Example usage:
 const chessGame = new ChessGame();
-chessGame.makeMove("g2g4"); // Example move
+chessGame.makeMove("a2a4"); // Example move
 chessGame.makeMove("e7e5"); // Example move
 chessGame.makeMove("f2f3"); // Example move
 chessGame.makeMove("d8h4"); // Example move
-chessGame.printBoard()
+//chessGame.makeMove("g2g3"); // Example move
+//chessGame.makeMove("a7a6"); // Example move
 chessGame.isCheckmate();
