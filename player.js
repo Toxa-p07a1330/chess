@@ -5,14 +5,22 @@ class AIPlayer {
         this.chessGame = chessGame;
     }
 
-    makeMove() {
+
+    makeMove(getMode = false) {
         // Implement your AI logic to generate a move
         // For simplicity, let's just make a random move for now
         const possibleMoves = this.generatePossibleMoves();
         const randomMove = this.getRandomMove(possibleMoves);
         // Make the chosen move on the chess board
-        this.chessGame.makeMove(randomMove);
+
+        if (getMode){
+            return randomMove
+        }
+        else {
+            this.chessGame.makeMove(randomMove);
+        }
     }
+
 
     generatePossibleMoves() {
         // Implement logic to generate a list of possible moves
@@ -75,7 +83,8 @@ class AIPlayer {
 const chessGame = new ChessGame();
 const aiPlayer = new AIPlayer(chessGame);
 // Make a move using the AIPlayer
-const stepsAmount = 100;
+const stepsAmount = 50;
 for (let i = 0; i < stepsAmount; i++) {
-    aiPlayer.makeMove();
+    const step = aiPlayer.makeMove(true);
+    aiPlayer.chessGame.makeMove(step)
 }
