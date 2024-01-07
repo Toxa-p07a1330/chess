@@ -1,4 +1,4 @@
-class ChessGame {
+export class ChessGame {
     constructor() {
         this.board = this.initializeBoard();
         this.currentPlayer = 'white';
@@ -543,18 +543,21 @@ class ChessGame {
 }
 
 // Example usage:
-const chessGame = new ChessGame();
-chessGame.makeMove("e2e4"); // Example move
-chessGame.makeMove("e7e6"); // Example move
-chessGame.makeMove("d2d4"); // Example move
-chessGame.makeMove("d7d6"); // Example move
-chessGame.makeMove("d1e2"); // Example move
-chessGame.makeMove("d8e7"); // Example move
-chessGame.makeMove("c1d2"); // Example move
-chessGame.makeMove("c8d7"); // Example move
-chessGame.makeMove("b1c3"); // Example move
-chessGame.makeMove("b8c6"); // Example move
-chessGame.makeMove("O-O-O"); // Example move
-chessGame.makeMove("O-O-O"); // Example move
+// const chessGame = new ChessGame();
+// chessGame.makeMove("e2e4"); // Example move
+// chessGame.makeMove("e7e6"); // Example move
+// chessGame.makeMove("d2d4"); // Example move
+// chessGame.makeMove("d7d6"); // Example move
+// chessGame.makeMove("d1e2"); // Example move
+// chessGame.makeMove("d8e7"); // Example move
+// chessGame.makeMove("c1d2"); // Example move
+// chessGame.makeMove("c8d7"); // Example move
+// chessGame.makeMove("b1c3"); // Example move
+// chessGame.makeMove("b8c6"); // Example move
+// chessGame.makeMove("O-O-O"); // Example move
+// chessGame.makeMove("O-O-O"); // Example move
+//
+// chessGame.isCheckmate();
+//
+//
 
-chessGame.isCheckmate();
