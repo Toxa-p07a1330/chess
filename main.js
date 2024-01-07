@@ -178,21 +178,20 @@ export class ChessGame {
             this.board[endRow][endCol] !== null &&
             this.board[endRow][endCol].charAt(0) !== this.currentPlayer.charAt(0); // Attack only opponent's pieces
 
-        if (Math.abs(endRow - startRow)>2)
+        if (Math.abs(endRow - startRow) > 2)
             return false
         if (isValidForwardMove || isValidAttackMove) {
             // Check for obstacles in the path (if any)
             for (let i = startRow + direction; i !== endRow; i += direction) {
-               try{
-                   if (this.board[i][endCol] !== null) {
-                       if (this.outputEnabled)
-                           console.log("Move is blocked by another piece");
-                       return false;
-                   }
-               }
-               catch (e){
-                   return false
-               }
+                try {
+                    if (this.board[i][endCol] !== null) {
+                        if (this.outputEnabled)
+                            console.log("Move is blocked by another piece");
+                        return false;
+                    }
+                } catch (e) {
+                    return false
+                }
             }
             return true;
         }
@@ -309,10 +308,20 @@ export class ChessGame {
             // Perform the move
             this.board[endRow][endCol] = this.board[startRow][startCol];
             this.board[startRow][startCol] = null;
+
+            //king was moved
             if (this.board[endRow][endCol] === "wk")
                 this.whiteKingMoved = true
             if (this.board[endRow][endCol] === "bk")
                 this.blackKingMoved = true
+
+
+            if (this.board[endRow][0] === "bp")
+                this.board[endRow][0] = "bq"
+
+            if (this.board[endRow][7] === "wp")
+                this.board[endRow][7] = "wq"
+
 
             // Switch the current player
             this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
