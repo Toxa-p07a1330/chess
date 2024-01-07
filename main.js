@@ -244,12 +244,19 @@ class ChessGame {
 
         // Check if the king is in check
         if (this.isInCheck()) {
-            // Check if there are any legal moves for the king
-            for (let i = kingRow - 1; i <= kingRow + 1; i++) {
-                for (let j = kingCol - 1; j <= kingCol + 1; j++) {
-                    if (this.isValidMove(kingRow, kingCol, i, j, true)) {
-                        // If there is at least one legal move, the king is not in checkmate
-                        return false;
+            // Check if there are any legal moves for any piece that removes the check
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    const piece = this.board[i][j];
+                    if (piece && piece.charAt(0) === this.currentPlayer.charAt(0)) {
+                        for (let row = 0; row < 8; row++) {
+                            for (let col = 0; col < 8; col++) {
+                                if (this.isValidMove(i, j, row, col, true) && !this.isInCheckAfterMove(i, j, row, col)) {
+                                    console.log(`${this.currentPlayer} is not in checkmate.`);
+                                    return false;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -260,7 +267,24 @@ class ChessGame {
         }
 
         // If the king is not in check, checkmate does not apply
+        console.log(`${this.currentPlayer} is not in check.`);
         return false;
+    }
+
+    isInCheckAfterMove(startRow, startCol, endRow, endCol) {
+        // Temporarily make the move to check if the king is still in check
+        const originalPiece = this.board[endRow][endCol];
+        this.board[endRow][endCol] = this.board[startRow][startCol];
+        this.board[startRow][startCol] = null;
+
+        // Check if the king is still in check after the move
+        const isInCheck = this.isInCheck();
+
+        // Undo the move
+        this.board[startRow][startCol] = this.board[endRow][endCol];
+        this.board[endRow][endCol] = originalPiece;
+
+        return isInCheck;
     }
 
     isInCheck() {
