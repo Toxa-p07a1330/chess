@@ -42,14 +42,7 @@ class ChessGame {
     }
 
     isValidMove(startRow, startCol, endRow, endCol, checkOpponent = false) {
-        // Implement logic to check if the move is valid
-        // This will depend on the specific rules of chess
-        // For simplicity, you can start with basic checks
-        // such as checking if the destination is within bounds
-        // and if there is a piece of the current player at the starting position
-        // and if the destination is either empty or has an opponent's piece.
-
-
+        // Check if the destination is within bounds
         if (
             startRow < 0 ||
             startRow > 7 ||
@@ -63,18 +56,17 @@ class ChessGame {
             return false; // Out of bounds
         }
 
-        // Example basic check:
         const startPiece = this.board[startRow][startCol];
-        const endPiece = this.board[endRow][endCol];
 
-
-
-
-
-        if (!startPiece || (checkOpponent && startPiece.charAt(0) === this.currentPlayer.charAt(0))) {
-            return false; // Invalid piece or not current player's piece
+        // Check if the starting cell is empty
+        if (!startPiece) {
+            return false; // Empty cell
         }
 
+        // Check if the piece in the starting cell has the correct color
+        if (checkOpponent && startPiece.charAt(0) === this.currentPlayer.charAt(0)) {
+            return false; // Wrong-colored piece
+        }
 
         // Check specific rules for the type of piece
         switch (startPiece.charAt(1)) {
@@ -94,10 +86,7 @@ class ChessGame {
                 console.log("Invalid piece type");
                 return false;
         }
-
-        // Add more complex rules based on the chess piece movement logic
-        // For simplicity, let's assume any move is valid for now
-        return true;
+        return true
     }
 
     // Methods for checking specific piece moves
