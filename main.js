@@ -178,6 +178,8 @@ export class ChessGame {
             this.board[endRow][endCol] !== null &&
             this.board[endRow][endCol].charAt(0) !== this.currentPlayer.charAt(0); // Attack only opponent's pieces
 
+        if (Math.abs(endRow - startRow)>2)
+            return false
         if (isValidForwardMove || isValidAttackMove) {
             // Check for obstacles in the path (if any)
             for (let i = startRow + direction; i !== endRow; i += direction) {

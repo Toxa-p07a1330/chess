@@ -10,7 +10,7 @@ class AIPlayer {
         // For simplicity, let's just make a random move for now
         const possibleMoves = this.generatePossibleMoves();
         const randomMove = this.getRandomMove(possibleMoves);
-
+        console.log(randomMove)
         // Make the chosen move on the chess board
         this.chessGame.makeMove(randomMove);
     }
@@ -67,7 +67,7 @@ class AIPlayer {
         const startRank = startRow + 1;
         const endFile = colMap[endCol];
         const endRank = endRow + 1;
-
+       // console.log(`${startFile}${startRank}${endFile}${endRank}`)
         return `${startFile}${startRank}${endFile}${endRank}`;
     }
 }
@@ -75,6 +75,5 @@ class AIPlayer {
 // Example usage:
 const chessGame = new ChessGame();
 const aiPlayer = new AIPlayer(chessGame);
-
 // Make a move using the AIPlayer
 aiPlayer.makeMove();
