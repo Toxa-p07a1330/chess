@@ -383,9 +383,8 @@ class ChessGame {
 
 // Example usage:
 const chessGame = new ChessGame();
-chessGame.makeMove("a2a4"); // Example move
+chessGame.makeMove("g2g4"); // Example move
 chessGame.makeMove("e7e5"); // Example move
 chessGame.makeMove("f2f3"); // Example move
 chessGame.makeMove("d8h4"); // Example move
-chessGame.makeMove("g2g4"); // Example move
 chessGame.isCheckmate();
