@@ -58,8 +58,6 @@ class ChessGame {
 
         const startPiece = this.board[startRow][startCol];
 
-
-
         // Check if the starting cell is empty
         if (!startPiece) {
             return false; // Empty cell
@@ -70,27 +68,56 @@ class ChessGame {
             return false; // Wrong-colored piece
         }
 
-
-
-        // Check specific rules for the type of piece
+        // Check if the move is valid according to the piece's rules
         switch (startPiece.charAt(1)) {
             case 'p':
-                return this.isValidPawnMove(startRow, startCol, endRow, endCol);
+                if (!this.isValidPawnMove(startRow, startCol, endRow, endCol)) {
+                    return false;
+                }
+                break;
             case 'r':
-                return this.isValidRookMove(startRow, startCol, endRow, endCol);
+                if (!this.isValidRookMove(startRow, startCol, endRow, endCol, true)) {
+                    return false;
+                }
+                break;
             case 'n':
-                return this.isValidKnightMove(startRow, startCol, endRow, endCol);
+                if (!this.isValidKnightMove(startRow, startCol, endRow, endCol)) {
+                    return false;
+                }
+                break;
             case 'b':
-                return this.isValidBishopMove(startRow, startCol, endRow, endCol);
+                if (!this.isValidBishopMove(startRow, startCol, endRow, endCol, true)) {
+                    return false;
+                }
+                break;
             case 'q':
-                return this.isValidQueenMove(startRow, startCol, endRow, endCol);
+                if (!this.isValidQueenMove(startRow, startCol, endRow, endCol)) {
+                    return false;
+                }
+                break;
             case 'k':
-                return this.isValidKingMove(startRow, startCol, endRow, endCol);
+                if (!this.isValidKingMove(startRow, startCol, endRow, endCol)) {
+                    return false;
+                }
+                break;
             default:
                 console.log("Invalid piece type");
                 return false;
         }
-        return true
+
+        // Temporarily make the move to check if the king is still in check
+        const originalPiece = this.board[endRow][endCol];
+        this.board[endRow][endCol] = this.board[startRow][startCol];
+        this.board[startRow][startCol] = null;
+
+        // Check if the king is still in check after the move
+        const isInCheck = this.isInCheck();
+
+        // Undo the move
+        this.board[startRow][startCol] = this.board[endRow][endCol];
+        this.board[endRow][endCol] = originalPiece;
+
+        return !isInCheck;
     }
 
     // Methods for checking specific piece moves
