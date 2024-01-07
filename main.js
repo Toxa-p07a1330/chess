@@ -125,13 +125,23 @@ class ChessGame {
         return false;
     }
 
-    isValidRookMove(startRow, startCol, endRow, endCol) {
+
+    isValidKnightMove(startRow, startCol, endRow, endCol) {
+        // Simplified knight move logic (no obstacles to check)
+        return (Math.abs(startRow - endRow) === 2 && Math.abs(startCol - endCol) === 1) ||
+            (Math.abs(startRow - endRow) === 1 && Math.abs(startCol - endCol) === 2);
+    }
+
+    isValidRookMove(startRow, startCol, endRow, endCol, fromQueenCheck = false) {
+        // Rook move logic
         if (startRow === endRow) {
             // Horizontal move
             const step = startCol < endCol ? 1 : -1;
             for (let i = startCol + step; i !== endCol; i += step) {
                 if (this.board[startRow][i] !== null) {
-                    console.log("Move is blocked by another piece");
+                    if (!fromQueenCheck) {
+                        console.log("Move is blocked by another piece");
+                    }
                     return false;
                 }
             }
@@ -141,43 +151,47 @@ class ChessGame {
             const step = startRow < endRow ? 1 : -1;
             for (let i = startRow + step; i !== endRow; i += step) {
                 if (this.board[i][startCol] !== null) {
-                    console.log("Move is blocked by another piece");
+                    if (!fromQueenCheck) {
+                        console.log("Move is blocked by another piece");
+                    }
                     return false;
                 }
             }
             return true;
         }
 
-        console.log("Invalid move for rook");
+        if (!fromQueenCheck) {
+            console.log("Invalid move for rook");
+        }
         return false;
     }
 
-    isValidKnightMove(startRow, startCol, endRow, endCol) {
-        // Simplified knight move logic (no obstacles to check)
-        return (Math.abs(startRow - endRow) === 2 && Math.abs(startCol - endCol) === 1) ||
-            (Math.abs(startRow - endRow) === 1 && Math.abs(startCol - endCol) === 2);
-    }
-
-    isValidBishopMove(startRow, startCol, endRow, endCol) {
+    isValidBishopMove(startRow, startCol, endRow, endCol, fromQueenCheck = false) {
+        // Bishop move logic
         if (Math.abs(startRow - endRow) === Math.abs(startCol - endCol)) {
             const rowStep = startRow < endRow ? 1 : -1;
             const colStep = startCol < endCol ? 1 : -1;
             for (let i = 1; i < Math.abs(startRow - endRow); i++) {
                 if (this.board[startRow + i * rowStep][startCol + i * colStep] !== null) {
-                    console.log("Move is blocked by another piece");
+                    if (!fromQueenCheck) {
+                        console.log("Move is blocked by another piece");
+                    }
                     return false;
                 }
             }
             return true;
         }
 
-        console.log("Invalid move for bishop");
+        if (!fromQueenCheck) {
+            console.log("Invalid move for bishop");
+        }
         return false;
     }
 
+
     isValidQueenMove(startRow, startCol, endRow, endCol) {
-        return this.isValidRookMove(startRow, startCol, endRow, endCol) ||
-            this.isValidBishopMove(startRow, startCol, endRow, endCol);
+        return this.isValidRookMove(startRow, startCol, endRow, endCol, true) ||
+            this.isValidBishopMove(startRow, startCol, endRow, endCol, true);
     }
 
     isValidKingMove(startRow, startCol, endRow, endCol) {
