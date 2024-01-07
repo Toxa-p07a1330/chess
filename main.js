@@ -181,11 +181,16 @@ class ChessGame {
         if (isValidForwardMove || isValidAttackMove) {
             // Check for obstacles in the path (if any)
             for (let i = startRow + direction; i !== endRow; i += direction) {
-                if (this.board[i][endCol] !== null) {
-                    if (this.outputEnabled)
-                        console.log("Move is blocked by another piece");
-                    return false;
-                }
+               try{
+                   if (this.board[i][endCol] !== null) {
+                       if (this.outputEnabled)
+                           console.log("Move is blocked by another piece");
+                       return false;
+                   }
+               }
+               catch (e){
+                   return false
+               }
             }
             return true;
         }
@@ -316,14 +321,11 @@ class ChessGame {
 
     performShortCastling() {
         const row = this.currentPlayer === 'white' ? 0 : 7;
-        const castlingEndCol = this.currentPlayer === 'white' ? 6 : 5;
-
         const kingMoved = this.currentPlayer === 'white' ? this.whiteKingMoved : this.blackKingMoved;
-
         if (
             kingMoved ||
             !this.isRookInPosition(row, 7) ||
-            !this.isValidCastlingMove(row, 4, row, castlingEndCol)
+            !this.isValidCastlingMove(row, 4, row, 6)
         ) {
             console.log("Short castling is not allowed");
             return;
@@ -348,25 +350,24 @@ class ChessGame {
     }
 
     performLongCastling() {
-        const rookCol = this.currentPlayer === 'white' ? 0 : 7;
-        const castlingEndCol = this.currentPlayer === 'white' ? 2 : 3;
-
+        const row = this.currentPlayer === 'white' ? 0 : 7;
         const kingMoved = this.currentPlayer === 'white' ? this.whiteKingMoved : this.blackKingMoved;
-
         if (
             kingMoved ||
-            !this.isRookInPosition(7, rookCol) ||
-            !this.isValidCastlingMove(7, 4, 7, castlingEndCol)
+            !this.isRookInPosition(row, 0) ||
+            !this.isValidCastlingMove(row, 4, row, 2)
         ) {
             console.log("Long castling is not allowed");
             return;
         }
 
         // Move the king
-        this.board[7][castlingEndCol] = this.board[7][4];
-
+        this.board[row][2] = this.board[row][4];
+        this.board[row][4] = null;
         // Move the rook
-        this.board[7][castlingEndCol + 1] = this.board[7][rookCol];
+        this.board[row][3] = this.board[row][0];
+        this.board[row][0] = null
+
 
         if (this.currentPlayer === 'white') {
             this.whiteKingMoved = true;
@@ -391,7 +392,6 @@ class ChessGame {
     isValidCastlingMove(startRow, startCol, endRow, endCol) {
 
         const startPiece = this.board[startRow][startCol];
-        const endPiece = this.board[endRow][endCol];
 
         // Check if the starting cell is empty or has the king
         if (!startPiece || startPiece.charAt(1) !== 'k') {
@@ -541,15 +541,16 @@ class ChessGame {
 // Example usage:
 const chessGame = new ChessGame();
 chessGame.makeMove("e2e4"); // Example move
-chessGame.makeMove("e7e5"); // Example move
-chessGame.makeMove("f1e2"); // Example move
-chessGame.makeMove("h7h6"); // Example move
-chessGame.makeMove("g1f3"); // Example move
-chessGame.makeMove("g7g5"); // Example move
-chessGame.makeMove("O-O"); // Example move
-chessGame.makeMove("f8e7"); // Example move
-chessGame.makeMove("a2a3"); // Example move
-chessGame.makeMove("g8f6"); // Example move
-chessGame.makeMove("a3a4"); // Example move
-chessGame.makeMove("O-O")
+chessGame.makeMove("e7e6"); // Example move
+chessGame.makeMove("d2d4"); // Example move
+chessGame.makeMove("d7d6"); // Example move
+chessGame.makeMove("d1e2"); // Example move
+chessGame.makeMove("d8e7"); // Example move
+chessGame.makeMove("c1d2"); // Example move
+chessGame.makeMove("c8d7"); // Example move
+chessGame.makeMove("b1c3"); // Example move
+chessGame.makeMove("b8c6"); // Example move
+chessGame.makeMove("O-O-O"); // Example move
+chessGame.makeMove("O-O-O"); // Example move
+
 chessGame.isCheckmate();
