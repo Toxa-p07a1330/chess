@@ -6,21 +6,63 @@ class AIPlayer {
     }
 
 
-    makeMove(getMode = false) {
-        // Implement your AI logic to generate a move
-        // For simplicity, let's just make a random move for now
+    makeMove(getMode) {
         const possibleMoves = this.generatePossibleMoves();
-        const randomMove = this.getRandomMove(possibleMoves);
-        // Make the chosen move on the chess board
+        // Initialize with a very low score
+        let bestScore = -Infinity;
+        let bestMove = null;
+
+        for (const move of possibleMoves) {
+            // Perform the move on a temporary board
+            const tempChessGame = this.cloneChessGame();
+            tempChessGame.makeMove(move);
+
+            // Calculate the score for the move
+            const score = this.calculateScore(tempChessGame);
+            let scoreValue = 0;
+            if (this.chessGame.currentPlayer === "white"){
+                scoreValue = score.whiteScore - score.blackScore
+            }
+            else{
+                scoreValue = score.blackScore - score.whiteScore
+            }
+            // Update the best move if the current move has a higher score
+            if (scoreValue > bestScore) {
+                bestScore = scoreValue;
+                bestMove = move;
+            }
+        }
+
 
         if (getMode){
-            return randomMove
+            return bestMove
         }
         else {
-            this.chessGame.makeMove(randomMove);
+            this.chessGame.makeMove(bestMove);
         }
     }
 
+
+    cloneChessGame() {
+        // Create a deep clone of the chess game instance
+        const clonedChessGame = new ChessGame();
+
+        // Copy the current board state
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                clonedChessGame.board[i][j] = this.chessGame.board[i][j];
+            }
+        }
+
+        // Copy other relevant state (currentPlayer, outputEnabled, etc.)
+        clonedChessGame.currentPlayer = this.chessGame.currentPlayer;
+        clonedChessGame.outputEnabled = this.chessGame.outputEnabled;
+        clonedChessGame.printBoard = ()=>{}
+
+        // Add other state variables as needed
+
+        return clonedChessGame;
+    }
 
     generatePossibleMoves() {
         // Implement logic to generate a list of possible moves
@@ -78,7 +120,8 @@ class AIPlayer {
         return `${startFile}${startRank}${endFile}${endRank}`;
     }
 
-    calculateScore() {
+    calculateScore(tempChessGame) {
+        const chessGame = tempChessGame || this.chessGame
         const pieceValues = {
             'p': 1,
             'n': 3.5,
@@ -94,7 +137,7 @@ class AIPlayer {
         // Loop through the board to calculate scores
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                const piece = this.chessGame.board[i][j];
+                const piece = chessGame.board[i][j];
                 if (piece) {
                     const pieceType = piece.charAt(1);
                     const pieceColor = piece.charAt(0);
@@ -103,13 +146,13 @@ class AIPlayer {
                     let pieceScore = pieceValues[pieceType];
 
                     // Check if the piece is protected
-                    const isProtected = this.isSquareProtected(i, j, pieceColor);
+                    const isProtected = this.isSquareProtected(i, j, pieceColor, chessGame);
                     if (isProtected) {
                         pieceScore *= 1.2; // Increase value by 20%
                     }
 
                     // Check if the piece is attacked
-                    const isAttacked = this.isSquareAttacked(i, j, pieceColor);
+                    const isAttacked = this.isSquareAttacked(i, j, pieceColor, chessGame);
                     if (isAttacked) {
                         pieceScore *= 0.65; // Decrease value by 35%
                     }
@@ -134,12 +177,12 @@ class AIPlayer {
         return { whiteScore, blackScore };
     }
 
-    isSquareProtected(row, col, color) {
+    isSquareProtected(row, col, color, chessGame) {
         // Check if the square is protected by any piece of the same color
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                const piece = this.chessGame.board[i][j];
-                if (piece && piece.charAt(0) === color && this.chessGame.isValidMove(i, j, row, col, false)) {
+                const piece = chessGame.board[i][j];
+                if (piece && piece.charAt(0) === color && chessGame.isValidMove(i, j, row, col, false)) {
                     return true;
                 }
             }
@@ -147,13 +190,13 @@ class AIPlayer {
         return false;
     }
 
-    isSquareAttacked(row, col, color) {
+    isSquareAttacked(row, col, color, chessGame) {
         // Check if the square is attacked by any piece of the opposite color
         const opponentColor = color === 'w' ? 'b' : 'w';
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                const piece = this.chessGame.board[i][j];
-                if (piece && piece.charAt(0) === opponentColor && this.chessGame.isValidMove(i, j, row, col, true)) {
+                const piece = chessGame.board[i][j];
+                if (piece && piece.charAt(0) === opponentColor && chessGame.isValidMove(i, j, row, col, true)) {
                     return true;
                 }
             }
@@ -176,10 +219,7 @@ class AIPlayer {
 const chessGame = new ChessGame();
 const aiPlayer = new AIPlayer(chessGame);
 // Make a move using the AIPlayer
-const stepsAmount = 50;
+const stepsAmount = 1;
 for (let i = 0; i < stepsAmount; i++) {
-    const step = aiPlayer.makeMove(true);
-    aiPlayer.chessGame.makeMove(step)
-    const score = aiPlayer.calculateScore()
-    console.log(score)
+    aiPlayer.makeMove();
 }

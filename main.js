@@ -281,6 +281,9 @@ export class ChessGame {
 
 
     algebraicToIndices(algebraicNotation) {
+        if (!algebraicNotation){
+            return  {startRow: 0, startCol: 0, endRow: 0, endCol: 0};
+        }
         const colMap = {a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7};
         const startCol = colMap[algebraicNotation[0]];
         const startRow = parseInt(algebraicNotation[1], 10) - 1;
@@ -316,11 +319,11 @@ export class ChessGame {
                 this.blackKingMoved = true
 
 
-            if (this.board[endRow][0] === "bp")
-                this.board[endRow][0] = "bq"
+            if (this.board[0][endCol] === "bp")
+                this.board[0][endCol] = "bq"
 
-            if (this.board[endRow][7] === "wp")
-                this.board[endRow][7] = "wq"
+            if (this.board[7][endCol] === "wp")
+                this.board[7][endCol] = "wq"
 
 
             // Switch the current player
