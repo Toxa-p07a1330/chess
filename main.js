@@ -359,6 +359,7 @@ export class ChessGame {
             const tempChessGame = this.cloneChessGame();
             tempChessGame.board[endRow][endCol] = tempChessGame.board[startRow][startCol];
             tempChessGame.board[startRow][startCol] = null;
+            this.promotePawns(tempChessGame.board)
 
             // Check if the king is under check after the move
             if (!tempChessGame.isInCheck()) {
@@ -369,6 +370,9 @@ export class ChessGame {
                 // Update king moved status
                 if (this.board[endRow][endCol] === "wk") this.whiteKingMoved = true;
                 if (this.board[endRow][endCol] === "bk") this.blackKingMoved = true;
+
+                this.promotePawns(this.board)
+
 
                 // Switch the current player
                 this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
@@ -382,6 +386,20 @@ export class ChessGame {
         } else {
             // if (this.outputEnabled)
             console.log('Invalid move');
+        }
+    }
+
+    promotePawns(board) {
+        for (let i = 0; i < 8; i++) {
+            if (board[7][i] === 'wp') {
+                board[7][i] = 'wq'; // Transform pawn to queen
+            }
+        }
+
+        for (let i = 0; i < 8; i++) {
+            if (board[0][i] === 'bp') {
+                board[0][i] = 'bq'; // Transform pawn to queen
+            }
         }
     }
 
@@ -604,22 +622,19 @@ export class ChessGame {
     }
 }
 
-// Example usage:
 // const chessGame = new ChessGame();
 // chessGame.makeMove("e2e4"); // Example move
-// chessGame.makeMove("e7e6"); // Example move
-// chessGame.makeMove("d2d4"); // Example move
-// chessGame.makeMove("d7d6"); // Example move
-// chessGame.makeMove("d1e2"); // Example move
-// chessGame.makeMove("d8e7"); // Example move
-// chessGame.makeMove("c1d2"); // Example move
-// chessGame.makeMove("c8d7"); // Example move
-// chessGame.makeMove("b1c3"); // Example move
-// chessGame.makeMove("b8c6"); // Example move
-// chessGame.makeMove("O-O-O"); // Example move
-// chessGame.makeMove("O-O-O"); // Example move
+// chessGame.makeMove("d7d5"); // Example move
+// chessGame.makeMove("e4d5"); // Example move
+// chessGame.makeMove("c7c5"); // Example move
+// chessGame.makeMove("d5d6"); // Example move
+// chessGame.makeMove("e7e5"); // Example move
+// chessGame.makeMove("d6d7"); // Example move
+// chessGame.makeMove("e8e7"); // Example move
+// chessGame.makeMove("d7c8"); // Example move
+//
 //
 // chessGame.isCheckmate();
-//
-//
+
+
 
