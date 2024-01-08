@@ -38,9 +38,6 @@ class AIPlayer {
             }
         }
 
-
-        console.log(bestMove)
-        console.log(bestScore)
         if (getMode) {
             return bestMove
         } else {
@@ -203,7 +200,7 @@ class AIPlayer {
 const chessGame = new ChessGame();
 const aiPlayer = new AIPlayer(chessGame);
 // Make a move using the AIPlayer
-const stepsAmount = 25;
+const stepsAmount = 50;
 for (let i = 0; i < stepsAmount; i++) {
     console.log("white")
     aiPlayer.makeMove();        //white
