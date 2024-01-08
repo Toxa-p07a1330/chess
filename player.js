@@ -127,7 +127,7 @@ class AIPlayer {
             'p': 1,
             'n': 3.5,
             'b': 3,
-            'r': 9,
+            'r': 4,
             'q': 9,
             'k': 100,
         };
@@ -220,7 +220,7 @@ class AIPlayer {
 const chessGame = new ChessGame();
 const aiPlayer = new AIPlayer(chessGame);
 // Make a move using the AIPlayer
-const stepsAmount = 22;
+const stepsAmount = 20;
 for (let i = 0; i < stepsAmount; i++) {
     console.log("white")
     aiPlayer.makeMove();        //white
