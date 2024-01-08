@@ -14,7 +14,7 @@ class AIPlayer {
 
         for (const move of possibleMoves) {
             // Perform the move on a temporary board
-            const tempChessGame = this.cloneChessGame();
+            const tempChessGame = this.chessGame.cloneChessGame();
             tempChessGame.makeMove(move);
 
             // Calculate the score for the move
@@ -40,29 +40,6 @@ class AIPlayer {
         } else {
             this.chessGame.makeMove(bestMove);
         }
-    }
-
-
-    cloneChessGame() {
-        // Create a deep clone of the chess game instance
-        const clonedChessGame = new ChessGame();
-
-        // Copy the current board state
-        for (let i = 0; i < 8; i++) {
-            for (let j = 0; j < 8; j++) {
-                clonedChessGame.board[i][j] = this.chessGame.board[i][j];
-            }
-        }
-
-        // Copy other relevant state (currentPlayer, outputEnabled, etc.)
-        clonedChessGame.currentPlayer = this.chessGame.currentPlayer;
-        clonedChessGame.outputEnabled = this.chessGame.outputEnabled;
-        clonedChessGame.printBoard = () => {
-        }
-
-        // Add other state variables as needed
-
-        return clonedChessGame;
     }
 
     generatePossibleMoves() {

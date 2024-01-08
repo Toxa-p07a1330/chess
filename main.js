@@ -281,8 +281,8 @@ export class ChessGame {
 
 
     algebraicToIndices(algebraicNotation) {
-        if (!algebraicNotation){
-            return  {startRow: 0, startCol: 0, endRow: 0, endCol: 0};
+        if (!algebraicNotation) {
+            return {startRow: 0, startCol: 0, endRow: 0, endCol: 0};
         }
         const colMap = {a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7};
         const startCol = colMap[algebraicNotation[0]];
@@ -290,6 +290,31 @@ export class ChessGame {
         const endCol = colMap[algebraicNotation[2]];
         const endRow = parseInt(algebraicNotation[3], 10) - 1;
         return {startRow, startCol, endRow, endCol};
+    }
+
+    cloneChessGame() {
+        const clonedGame = new ChessGame();
+        clonedGame.board = this.deepCloneBoard(this.board);
+        clonedGame.currentPlayer = this.currentPlayer;
+        clonedGame.outputEnabled = this.outputEnabled;
+        clonedGame.status = this.status;
+        clonedGame.whiteKingMoved = this.whiteKingMoved;
+        clonedGame.blackKingMoved = this.blackKingMoved;
+
+        return clonedGame;
+    }
+
+    deepCloneBoard(board) {
+        // Helper function to deep clone the chess board
+        const clonedBoard = [];
+        for (let i = 0; i < board.length; i++) {
+            const row = [];
+            for (let j = 0; j < board[i].length; j++) {
+                row.push(board[i][j]);
+            }
+            clonedBoard.push(row);
+        }
+        return clonedBoard;
     }
 
     makeMove(algebraicNotation) {
@@ -308,29 +333,29 @@ export class ChessGame {
         this.outputEnabled = true; // Enable output for makeMove
         this.status = ""
         if (this.isValidMove(startRow, startCol, endRow, endCol)) {
-            // Perform the move
-            this.board[endRow][endCol] = this.board[startRow][startCol];
-            this.board[startRow][startCol] = null;
+            const tempChessGame = this.cloneChessGame();
+            tempChessGame.board[endRow][endCol] = tempChessGame.board[startRow][startCol];
+            tempChessGame.board[startRow][startCol] = null;
 
-            //king was moved
-            if (this.board[endRow][endCol] === "wk")
-                this.whiteKingMoved = true
-            if (this.board[endRow][endCol] === "bk")
-                this.blackKingMoved = true
+            // Check if the king is under check after the move
+            if (!tempChessGame.isInCheck()) {
+                // Update the actual board
+                this.board[endRow][endCol] = this.board[startRow][startCol];
+                this.board[startRow][startCol] = null;
 
+                // Update king moved status
+                if (this.board[endRow][endCol] === "wk") this.whiteKingMoved = true;
+                if (this.board[endRow][endCol] === "bk") this.blackKingMoved = true;
 
-            if (this.board[0][endCol] === "bp")
-                this.board[0][endCol] = "bq"
+                // Switch the current player
+                this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
 
-            if (this.board[7][endCol] === "wp")
-                this.board[7][endCol] = "wq"
-
-
-            // Switch the current player
-            this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
-
-            // Log the updated board
-            this.printBoard();
+                // Log the updated board
+                this.printBoard();
+            } else {
+                // if (this.outputEnabled)
+                console.log('Invalid move - King is under check after the move');
+            }
         } else {
             // if (this.outputEnabled)
             console.log('Invalid move');
@@ -532,7 +557,7 @@ export class ChessGame {
 
                     if (this.isValidMove(i, j, kingRow, kingCol, true)) {
                         if (!this.status) {
-                           // console.log(`${this.currentPlayer}'s king is in check!`);
+                            // console.log(`${this.currentPlayer}'s king is in check!`);
                             this.status = `${this.currentPlayer}'s king is in check!`
                         }
                         return true;
