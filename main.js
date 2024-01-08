@@ -488,7 +488,7 @@ export class ChessGame {
         }
 
         // If the king is not in check, checkmate does not apply
-        console.log(`${this.currentPlayer} is not in check.`);
+        //console.log(`${this.currentPlayer} is not in check.`);
         return false;
     }
 
@@ -532,7 +532,7 @@ export class ChessGame {
 
                     if (this.isValidMove(i, j, kingRow, kingCol, true)) {
                         if (!this.status) {
-                            console.log(`${this.currentPlayer}'s king is in check!`);
+                           // console.log(`${this.currentPlayer}'s king is in check!`);
                             this.status = `${this.currentPlayer}'s king is in check!`
                         }
                         return true;
