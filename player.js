@@ -20,10 +20,9 @@ class AIPlayer {
             // Calculate the score for the move
             const score = this.calculateScore(tempChessGame);
             let scoreValue = 0;
-            if (this.chessGame.currentPlayer === "white"){
+            if (this.chessGame.currentPlayer === "white") {
                 scoreValue = score.whiteScore - score.blackScore
-            }
-            else{
+            } else {
                 scoreValue = score.blackScore - score.whiteScore
             }
             // Update the best move if the current move has a higher score
@@ -34,10 +33,11 @@ class AIPlayer {
         }
 
 
-        if (getMode){
+        console.log(bestMove)
+        console.log(bestScore)
+        if (getMode) {
             return bestMove
-        }
-        else {
+        } else {
             this.chessGame.makeMove(bestMove);
         }
     }
@@ -57,7 +57,8 @@ class AIPlayer {
         // Copy other relevant state (currentPlayer, outputEnabled, etc.)
         clonedChessGame.currentPlayer = this.chessGame.currentPlayer;
         clonedChessGame.outputEnabled = this.chessGame.outputEnabled;
-        clonedChessGame.printBoard = ()=>{}
+        clonedChessGame.printBoard = () => {
+        }
 
         // Add other state variables as needed
 
@@ -174,7 +175,7 @@ class AIPlayer {
         whiteScore += whiteChecks * 0.25;
         blackScore -= blackChecks * 0.25;
 
-        return { whiteScore, blackScore };
+        return {whiteScore, blackScore};
     }
 
     isSquareProtected(row, col, color, chessGame) {
@@ -219,7 +220,16 @@ class AIPlayer {
 const chessGame = new ChessGame();
 const aiPlayer = new AIPlayer(chessGame);
 // Make a move using the AIPlayer
-const stepsAmount = 1;
+const stepsAmount = 22;
 for (let i = 0; i < stepsAmount; i++) {
-    aiPlayer.makeMove();
+    console.log("white")
+    aiPlayer.makeMove();        //white
+    console.log("black")
+    aiPlayer.makeMove();        //black
+    console.log(aiPlayer.calculateScore())
+    console.log("\n\n")
+    if (aiPlayer.chessGame.isCheckmate()) {
+        console.log("CheckMate!")
+        break
+    }
 }
