@@ -86,11 +86,10 @@ export class ChessGame {
             return false; // Self taking
         }
 
-
         // Check if the move is valid according to the piece's rules
         switch (startPiece.charAt(1)) {
             case 'p':
-                if (!this.isValidPawnMove(startRow, startCol, endRow, endCol)) {
+                if (!this.isValidPawnMove(startRow, startCol, endRow, endCol, checkOpponent)) {
                     return false;
                 }
                 break;
@@ -161,15 +160,25 @@ export class ChessGame {
 
 
     // Methods for checking specific piece moves
-    isValidPawnMove(startRow, startCol, endRow, endCol) {
-        const direction = this.board[startRow][startRow]?.charAt(0) === 'w' ? 1 : -1;
+    isValidPawnMove(startRow, startCol, endRow, endCol, checkOpponent) {
+
+        let direction = this.currentPlayer === 'white' ? 1 : -1;
+        if (checkOpponent) direction = direction * -1;
+        const colorDiff = checkOpponent ? (this.board[endRow][endCol]?.charAt(0) === this.currentPlayer.charAt(0)
+        ) : (this.board[endRow][endCol]?.charAt(0) !== this.currentPlayer.charAt(0)
+        )
         const isValidForwardMove = startCol === endCol && this.board[endRow][endCol] === null;
         const isValidAttackMove =
             Math.abs(startCol - endCol) === 1 &&
             endRow - startRow === direction &&
             this.board[endRow][endCol] !== null &&
-            this.board[endRow][endCol].charAt(0) !== this.board[startRow][startRow].charAt(0); // Attack only opponent's pieces
+            colorDiff
 
+
+        if (startRow === 3 && endRow === 4 && this.board[endRow][endCol] === "bk" && startCol === 5 && endCol === 4) {
+            console.log("black king eaten")
+            console.log("check", checkOpponent)
+        }
 
         if (Math.abs(endRow - startRow) > 2)
             return false
@@ -275,6 +284,11 @@ export class ChessGame {
         const oldDestination = this.board[endRow][endCol]
         this.board[endRow][endCol] = this.board[startRow][startCol]
         this.board[startRow][startCol] = null
+
+        if (startRow === 5 && endRow === 4 && this.board[endRow][endCol] === "bk" && startCol === 4 && endCol === 4) {
+            console.log("black king_________________________")
+            console.log(this.isSquareUnderAttack(endRow, endCol))
+        }
 
         if (this.isSquareUnderAttack(endRow, endCol)) {
             this.board[startRow][startCol] = this.board[endRow][endCol]

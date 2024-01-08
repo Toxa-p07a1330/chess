@@ -197,7 +197,7 @@ class AIPlayer {
 const chessGame = new ChessGame();
 const aiPlayer = new AIPlayer(chessGame);
 // Make a move using the AIPlayer
-const stepsAmount = 24;
+const stepsAmount = 35;
 for (let i = 0; i < stepsAmount; i++) {
     console.log("white")
     aiPlayer.makeMove();        //white
