@@ -61,13 +61,16 @@ export class ChessGame {
         }
 
         const startPiece = this.board[startRow][startCol];
-        const endPiece = endRow !== undefined && endCol !== undefined && this.board[endRow][endCol] || null;
+        const endPiece = endRow !== undefined && endCol !== undefined && this.board[endRow][endCol];
 
 
         // Check if the starting cell is empty
         if (!startPiece) {
             return false; // Empty cell
         }
+
+        if (endPiece === undefined || endRow === undefined || endCol === undefined)
+            return false
 
         // Check if the piece in the starting cell has the correct color
         if (checkOpponent && startPiece.charAt(0) === this.currentPlayer.charAt(0)) {
@@ -138,13 +141,13 @@ export class ChessGame {
     }
 
 
-    isSquareUnderAttack(row, col) {
+    isSquareUnderAttack(row, col, board) {
         // Check if the square is under attack by the opponent
         const opponentColor = this.currentPlayer === 'white' ? 'black' : 'white';
-
+        const resultBoard = board || this.board
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                const piece = this.board[i][j];
+                const piece = resultBoard[i][j];
                 if (piece && piece.charAt(0) === opponentColor.charAt(0)) {
                     if (this.isValidMove(i, j, row, col, true)) {
                         return true;
@@ -156,30 +159,21 @@ export class ChessGame {
         return false;
     }
 
-    updateKingMovedStatus(piece) {
-        // Extract color from the piece notation
-        const color = piece.charAt(0);
-
-        // Update king movement status based on color
-        if (color === 'w') {
-            this.whiteKingMoved = true;
-        } else if (color === 'b') {
-            this.blackKingMoved = true;
-        }
-    }
 
     // Methods for checking specific piece moves
     isValidPawnMove(startRow, startCol, endRow, endCol) {
-        const direction = this.currentPlayer === 'white' ? 1 : -1;
+        const direction = this.board[startRow][startRow]?.charAt(0) === 'w' ? 1 : -1;
         const isValidForwardMove = startCol === endCol && this.board[endRow][endCol] === null;
         const isValidAttackMove =
             Math.abs(startCol - endCol) === 1 &&
             endRow - startRow === direction &&
             this.board[endRow][endCol] !== null &&
-            this.board[endRow][endCol].charAt(0) !== this.currentPlayer.charAt(0); // Attack only opponent's pieces
+            this.board[endRow][endCol].charAt(0) !== this.board[startRow][startRow].charAt(0); // Attack only opponent's pieces
+
 
         if (Math.abs(endRow - startRow) > 2)
             return false
+
         if (isValidForwardMove || isValidAttackMove) {
             // Check for obstacles in the path (if any)
             for (let i = startRow + direction; i !== endRow; i += direction) {
@@ -276,6 +270,19 @@ export class ChessGame {
     }
 
     isValidKingMove(startRow, startCol, endRow, endCol) {
+
+
+        const oldDestination = this.board[endRow][endCol]
+        this.board[endRow][endCol] = this.board[startRow][startCol]
+        this.board[startRow][startCol] = null
+
+        if (this.isSquareUnderAttack(endRow, endCol)) {
+            this.board[startRow][startCol] = this.board[endRow][endCol]
+            this.board[endRow][endCol] = oldDestination
+            return false
+        }
+        this.board[startRow][startCol] = this.board[endRow][endCol]
+        this.board[endRow][endCol] = oldDestination
         return Math.abs(startRow - endRow) <= 1 && Math.abs(startCol - endCol) <= 1;
     }
 
@@ -300,6 +307,8 @@ export class ChessGame {
         clonedGame.status = this.status;
         clonedGame.whiteKingMoved = this.whiteKingMoved;
         clonedGame.blackKingMoved = this.blackKingMoved;
+        clonedGame.printBoard = () => {
+        }
 
         return clonedGame;
     }
