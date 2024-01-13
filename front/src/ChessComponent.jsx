@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 const ChessTestComponent = () => {
     const [gameName, setGameName] = useState('');
     const [inputMove, setInputMove] = useState('');
-    const [messages, setMessages] = useState([]);
+    const [lastMessage, setLastMessage] = useState(null);
     const [socket, setSocket] = useState(null);
 
     const connectToGame = () => {
@@ -17,7 +17,7 @@ const ChessTestComponent = () => {
 
             newSocket.addEventListener('message', (event) => {
                 const parsedData = JSON.parse(event.data);
-                setMessages((prevMessages) => [...prevMessages, parsedData]);
+                setLastMessage(parsedData);
             });
 
             newSocket.addEventListener('close', () => {
@@ -69,12 +69,8 @@ const ChessTestComponent = () => {
                 </>
             )}
             <hr />
-            <h3>Received Messages:</h3>
-            <ul>
-                {messages.map((message, index) => (
-                    <li key={index}>{JSON.stringify(message)}</li>
-                ))}
-            </ul>
+            <h3>Last Received Message:</h3>
+            {lastMessage && <p>{JSON.stringify(lastMessage)}</p>}
         </div>
     );
 };
