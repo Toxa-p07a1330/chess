@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState} from 'react';
+import styles from "./style.module.scss"
 
 const ChessTestComponent = () => {
     const [gameName, setGameName] = useState('');
@@ -50,27 +51,48 @@ const ChessTestComponent = () => {
         }
     };
 
+    const gameToMarkup = (board) => {
+        return (
+            <div className={styles.container}>
+                <h3>Chessboard Representation:</h3>
+                <table className={styles.chessboard}>
+                    <tbody>
+                    {board.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                            {row.map((piece, colIndex) => (
+                                <td key={colIndex}
+                                    className={colIndex % 2 === rowIndex % 2 ? styles.white : styles.black}
+                                >{piece || '.'}</td>
+                            ))}
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
+
     return (
         <div>
             <h2>Chess Test Component</h2>
             <label>
                 Enter Game Name:
-                <input type="text" value={gameName} onChange={handleGameNameChange} />
+                <input type="text" value={gameName} onChange={handleGameNameChange}/>
             </label>
             <button onClick={connectToGame}>Connect to Game</button>
-            <br />
+            <br/>
             {socket && (
                 <>
                     <label>
                         Enter Move:
-                        <input type="text" value={inputMove} onChange={handleMoveChange} />
+                        <input type="text" value={inputMove} onChange={handleMoveChange}/>
                     </label>
                     <button onClick={handleSendMove}>Send Move</button>
                 </>
             )}
-            <hr />
+            <hr/>
             <h3>Last Received Message:</h3>
-            {lastMessage && <p>{JSON.stringify(lastMessage)}</p>}
+            {lastMessage && gameToMarkup(lastMessage.board)}
         </div>
     );
 };
