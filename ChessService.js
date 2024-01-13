@@ -47,7 +47,7 @@ export class ChessService {
         if (moveObject.type === "move"){
             chessGame.makeMove(moveObject.payload)
         }
-        //this.broadcastGameState(chessGame);
+        this.broadcastGameState(chessGame);
     }
 
 
@@ -68,7 +68,7 @@ export class ChessService {
 
     // Broadcast the current game state to all clients
     broadcastGameState(chessGame) {
-        const gameState = chessGame.getGameState(); // Implement this method in your ChessGame class to get the current game state
+        const gameState = chessGame.getWebState(); // Implement this method in your ChessGame class to get the current game state
         this.wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify(gameState));

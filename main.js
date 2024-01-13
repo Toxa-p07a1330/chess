@@ -2,8 +2,6 @@ export class ChessGame {
     constructor() {
         this.board = this.initializeBoard();
         this.currentPlayer = 'white';
-        this.outputEnabled = true; // Flag to control output for invalid moves
-        this.status = "";
         this.whiteKingMoved = false;
         this.blackKingMoved = false;
     }
@@ -119,7 +117,6 @@ export class ChessGame {
                 }
                 break;
             default:
-                //    if (this.outputEnabled)
                 console.log("Invalid piece type");
                 return false;
         }
@@ -188,8 +185,6 @@ export class ChessGame {
             for (let i = startRow + direction; i !== endRow; i += direction) {
                 try {
                     if (this.board[i][endCol] !== null) {
-                        if (this.outputEnabled)
-                            console.log("Move is blocked by another piece");
                         return false;
                     }
                 } catch (e) {
@@ -198,9 +193,6 @@ export class ChessGame {
             }
             return true;
         }
-
-        if (this.outputEnabled)
-            console.log("Invalid move for pawn");
         return false;
     }
 
@@ -218,10 +210,6 @@ export class ChessGame {
             const step = startCol < endCol ? 1 : -1;
             for (let i = startCol + step; i !== endCol; i += step) {
                 if (this.board[startRow][i] !== null) {
-                    if (!fromQueenCheck) {
-                        if (this.outputEnabled)
-                            console.log("Move is blocked by another piece");
-                    }
                     return false;
                 }
             }
@@ -231,19 +219,10 @@ export class ChessGame {
             const step = startRow < endRow ? 1 : -1;
             for (let i = startRow + step; i !== endRow; i += step) {
                 if (this.board[i][startCol] !== null) {
-                    if (!fromQueenCheck) {
-                        if (this.outputEnabled)
-                            console.log("Move is blocked by another piece");
-                    }
                     return false;
                 }
             }
             return true;
-        }
-
-        if (!fromQueenCheck) {
-            if (this.outputEnabled)
-                console.log("Invalid move for rook");
         }
         return false;
     }
@@ -255,19 +234,10 @@ export class ChessGame {
             const colStep = startCol < endCol ? 1 : -1;
             for (let i = 1; i < Math.abs(startRow - endRow); i++) {
                 if (this.board[startRow + i * rowStep][startCol + i * colStep] !== null) {
-                    if (!fromQueenCheck) {
-                        if (this.outputEnabled)
-                            console.log("Move is blocked by another piece");
-                    }
                     return false;
                 }
             }
             return true;
-        }
-
-        if (!fromQueenCheck) {
-            if (this.outputEnabled)
-                console.log("Invalid move for bishop");
         }
         return false;
     }
@@ -317,8 +287,6 @@ export class ChessGame {
         const clonedGame = new ChessGame();
         clonedGame.board = this.deepCloneBoard(this.board);
         clonedGame.currentPlayer = this.currentPlayer;
-        clonedGame.outputEnabled = this.outputEnabled;
-        clonedGame.status = this.status;
         clonedGame.whiteKingMoved = this.whiteKingMoved;
         clonedGame.blackKingMoved = this.blackKingMoved;
         clonedGame.printBoard = () => {
@@ -353,8 +321,6 @@ export class ChessGame {
         }
 
         const {startRow, startCol, endRow, endCol} = this.algebraicToIndices(algebraicNotation);
-        this.outputEnabled = true; // Enable output for makeMove
-        this.status = ""
         if (this.isValidMove(startRow, startCol, endRow, endCol)) {
             const tempChessGame = this.cloneChessGame();
             tempChessGame.board[endRow][endCol] = tempChessGame.board[startRow][startCol];
@@ -380,11 +346,8 @@ export class ChessGame {
                 // Log the updated board
                 this.printBoard();
             } else {
-                // if (this.outputEnabled)
-                console.log('Invalid move - King is under check after the move');
             }
         } else {
-            // if (this.outputEnabled)
             console.log('Invalid move');
         }
     }
@@ -574,9 +537,16 @@ export class ChessGame {
         return isInCheck;
     }
 
+    getWebState() {
+        return {
+            board: this.board,
+            currentPlayer: this.currentPlayer,
+            isFinished: this.isCheckmate(),
+            isCheck: this.isInCheck()
+        }
+    }
+
     isInCheck() {
-        // Find the king's position
-        this.outputEnabled = false;
         let kingRow, kingCol;
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
@@ -597,10 +567,6 @@ export class ChessGame {
                 if (piece && piece.charAt(0) !== this.currentPlayer.charAt(0)) {
 
                     if (this.isValidMove(i, j, kingRow, kingCol, true)) {
-                        if (!this.status) {
-                            // console.log(`${this.currentPlayer}'s king is in check!`);
-                            this.status = `${this.currentPlayer}'s king is in check!`
-                        }
                         return true;
                     }
                 }

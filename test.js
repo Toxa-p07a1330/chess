@@ -16,10 +16,29 @@ socket.on('open', () => {
 });
 
 socket.on('message', (data) => {
-    console.log('Received message:', data);
-
-    // You can handle the received messages here
+    console.log('Received message',);
+    printReadableGame(data)
 });
+
+const printReadableGame = (data) => {
+    const dataParsed = JSON.parse(data.toString())
+    console.log("================")
+    for (let i = 7; i >= 0; i--) {
+        const row = dataParsed.board[i].map(piece => (piece ? piece : '.'));
+        console.log(row.join('\t'));
+    }
+    console.log("-----")
+    console.log("Next move: ", dataParsed.currentPlayer)
+    if (dataParsed.isCheck){
+        console.log("Checked")
+    }
+    if (dataParsed.isFinished){
+        console.log("Checkmated")
+    }
+    console.log("================")
+
+
+}
 
 socket.on('close', () => {
     console.log('Connection closed');
