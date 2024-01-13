@@ -104,6 +104,8 @@ const ChessTestComponent = () => {
 
     const [selectedPiece, setSelectedPiece] = useState(null);
 
+    console.log(selectedPiece)
+
 
     const handleCellClick = (row, col, piece) => {
         const file = String.fromCharCode('a'.charCodeAt(0) + col);
