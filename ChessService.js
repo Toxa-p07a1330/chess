@@ -13,7 +13,7 @@ export class ChessService {
 
             // Handle messages from clients
             ws.on('message', (message) => {
-                this.handleMessage(chessGame, ws, message);
+                this.handleMessage(chessGame, ws, message, gameName);
             });
 
             // Handle disconnection
@@ -33,7 +33,7 @@ export class ChessService {
     }
 
     // Handle incoming messages from clients
-    handleMessage(chessGame, ws, message) {
+    handleMessage(chessGame, ws, message, gameName) {
         // Implement logic to handle chess moves and other messages
         // You can use the chessGame instance to make moves and check game status
 
@@ -47,15 +47,9 @@ export class ChessService {
         if (moveObject.type === "move"){
             chessGame.makeMove(moveObject.payload)
         }
-        this.broadcastGameState(chessGame);
+        this.broadcastGameState(chessGame, gameName);
     }
 
-
-    handleChessMove(gameName, move) {
-        // Implement logic to handle the chess move in the specified game
-        // This is where you can update the game state, check for checkmate, etc.
-        console.log(`Handling chess move ${move} for game ${gameName}`);
-    }
 
     // Handle disconnection of clients
     handleDisconnect(chessGame, ws) {
@@ -67,8 +61,9 @@ export class ChessService {
     }
 
     // Broadcast the current game state to all clients
-    broadcastGameState(chessGame) {
+    broadcastGameState(chessGame, gameName) {
         const gameState = chessGame.getWebState(); // Implement this method in your ChessGame class to get the current game state
+        gameState.name = gameName
         this.wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify(gameState));

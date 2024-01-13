@@ -1,18 +1,33 @@
 import WebSocket from 'ws';
+import * as readlineSync from "readline-sync";
+import * as readline from "readline";
 
-// Replace 'ws://localhost:3000' with the actual WebSocket server URL
-const socket = new WebSocket('ws://localhost:3001/test_game');
+const gameName = readlineSync.question("Enter game name: ")
+const TIMEOUT = 100;
+const socket = new WebSocket('ws://localhost:3001/' + gameName);
 
-socket.on('open', () => {
-    console.log('Connected to the server');
+let isGameContinuing = true;
 
-    // Send a test message
-    const message = {
-        type: 'move',
-        payload: 'e2e4', // Replace with an actual chess move
-    };
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
 
-    socket.send(JSON.stringify(message));
+
+socket.on('open', async () => {
+    console.log('Connected to the server. Print stop for exit');
+
+    rl.on('line', (line) => {
+        //  Send a move message
+        const message = {
+            type: 'move',
+            payload: line,
+        };
+
+        socket.send(JSON.stringify(message));
+    });
+
+
 });
 
 socket.on('message', (data) => {
@@ -22,18 +37,19 @@ socket.on('message', (data) => {
 
 const printReadableGame = (data) => {
     const dataParsed = JSON.parse(data.toString())
-    console.log("================")
+    console.log(`========${dataParsed.name}========`)
     for (let i = 7; i >= 0; i--) {
         const row = dataParsed.board[i].map(piece => (piece ? piece : '.'));
         console.log(row.join('\t'));
     }
     console.log("-----")
     console.log("Next move: ", dataParsed.currentPlayer)
-    if (dataParsed.isCheck){
+    if (dataParsed.isCheck) {
         console.log("Checked")
     }
-    if (dataParsed.isFinished){
-        console.log("Checkmated")
+    if (dataParsed.isFinished) {
+        console.log("Checkmated");
+        isGameContinuing = false;
     }
     console.log("================")
 
