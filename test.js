@@ -36,6 +36,10 @@ socket.on('message', (data) => {
 
 const printReadableGame = (data) => {
     const dataParsed = JSON.parse(data.toString())
+    if (!dataParsed.success) {
+        console.log("Incorrect")
+        return
+    }
     console.log(`========${dataParsed.name}========`)
     for (let i = 7; i >= 0; i--) {
         const row = dataParsed.board[i].map(piece => (piece ? piece : '.'));

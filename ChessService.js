@@ -11,6 +11,8 @@ export class ChessService {
             const gameName = request.url.replace('/', ''); // Extract game name from the URL
             const chessGame = this.getOrCreateGame(gameName);
 
+            this.broadcastGameState(chessGame, gameName, true)
+
             // Handle messages from clients
             ws.on('message', (message) => {
                 this.handleMessage(chessGame, ws, message, gameName);
@@ -44,10 +46,12 @@ export class ChessService {
 
         const stringValue = message.toString();
         const moveObject = JSON.parse(stringValue)
+        let success = undefined
         if (moveObject.type === "move"){
-            chessGame.makeMove(moveObject.payload)
+            success = chessGame.makeMove(moveObject.payload)
         }
-        this.broadcastGameState(chessGame, gameName);
+
+        this.broadcastGameState(chessGame, gameName, success);
     }
 
 
@@ -61,9 +65,10 @@ export class ChessService {
     }
 
     // Broadcast the current game state to all clients
-    broadcastGameState(chessGame, gameName) {
+    broadcastGameState(chessGame, gameName, success) {
         const gameState = chessGame.getWebState(); // Implement this method in your ChessGame class to get the current game state
-        gameState.name = gameName
+        gameState.name = gameName;
+        gameState.success = success
         this.wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify(gameState));

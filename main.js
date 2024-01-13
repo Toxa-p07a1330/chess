@@ -345,10 +345,12 @@ export class ChessGame {
 
                 // Log the updated board
                 this.printBoard();
+                return true
             } else {
             }
         } else {
             console.log('Invalid move');
+            return false
         }
     }
 
