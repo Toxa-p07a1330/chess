@@ -3,7 +3,6 @@ import * as readlineSync from "readline-sync";
 import * as readline from "readline";
 
 const gameName = readlineSync.question("Enter game name: ")
-const TIMEOUT = 100;
 const socket = new WebSocket('ws://localhost:3001/' + gameName);
 
 let isGameContinuing = true;
